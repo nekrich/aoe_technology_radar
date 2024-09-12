@@ -9,7 +9,9 @@
     "showChart": true,
     "showTagFilter": true,
     "showQuadrantList": true,
-    "showEmptyRings": false
+    "showEmptyRings": false,
+    "showTagFilterInOverview": true,
+    "showTagFilterInQuadrants": true
   },
   "sections": ["radar", "tags", "list"],
   "colors": {

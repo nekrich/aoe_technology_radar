@@ -16,12 +16,12 @@ import {
   getTags,
   getToggle,
 } from "@/lib/data";
+import { FilterByTagsFilter, GetTagsFilter } from "@/lib/utilx";
 import { CustomPage } from "@/pages/_app";
 
 const Home: CustomPage = () => {
   const router = useRouter();
-  const tag = router.query.tag ? router.query.tag : router.query["tag[]"];
-  const activeTags = Array.isArray(tag) ? tag : tag ? [tag] : [];
+  const tagsFilter = GetTagsFilter(router);
 
   const appName = getAppName();
   const metaDescription = getLabel("metaDescription");
@@ -32,10 +32,7 @@ const Home: CustomPage = () => {
   const quadrants = getQuadrants();
   const tags = getTags();
   const items = getItems(undefined, true).filter(
-    (item) =>
-      !tag ||
-      item.tags?.filter((itemTag) => activeTags.includes(itemTag)).length ===
-        activeTags.length,
+    FilterByTagsFilter(tagsFilter),
   );
 
   return (
@@ -70,7 +67,7 @@ const Home: CustomPage = () => {
             return (
               getToggle("showTagFilter") &&
               tags.length > 0 && (
-                <Tags key={section} tags={tags} activeTags={activeTags} />
+                <Tags key={section} tags={tags} activeTags={tagsFilter} />
               )
             );
           case "list":
