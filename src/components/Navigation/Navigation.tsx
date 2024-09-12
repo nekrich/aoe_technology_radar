@@ -6,8 +6,15 @@ import IconOverview from "@/components/Icons/Overview";
 import IconQuestion from "@/components/Icons/Question";
 import IconSearch from "@/components/Icons/Search";
 import { getLabel, getToggle } from "@/lib/data";
+import { GetTagFilterURLQueryParams } from "@/lib/utilx";
 
 export function Navigation() {
+  const showTagFilterInOverview = getToggle("showTagFilterInOverview");
+  const tagFilterURLQueryParams = GetTagFilterURLQueryParams();
+  const overviewQuery =
+    showTagFilterInOverview && tagFilterURLQueryParams.length
+      ? `/?${tagFilterURLQueryParams}`
+      : "";
   return (
     <nav className={styles.nav}>
       <ul className={styles.list}>
@@ -18,7 +25,7 @@ export function Navigation() {
           </Link>
         </li>
         <li className={styles.item}>
-          <Link href="/overview">
+          <Link href={`/overview${overviewQuery}`}>
             <IconOverview className={styles.icon} />
             <span className={styles.label}>{getLabel("pageOverview")}</span>
           </Link>

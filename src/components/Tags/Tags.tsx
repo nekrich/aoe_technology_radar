@@ -1,5 +1,4 @@
 import Link, { LinkProps } from "next/link";
-import { useRouter } from "next/router";
 import { ComponentPropsWithoutRef } from "react";
 
 import styles from "./Tags.module.css";
@@ -8,56 +7,28 @@ import IconRemove from "@/components/Icons/Close";
 import IconTag from "@/components/Icons/Tag";
 import { getLabel } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { TagHref } from "@/lib/utilx";
 
 type TagProps = {
   tag: string;
   isActive?: boolean;
+  hrefIncludeCurrentPath?: boolean;
 } & Omit<LinkProps, "href"> &
   ComponentPropsWithoutRef<"a">;
 
-function QueryString(tag: string, isActive: boolean | undefined) {
-  const router = useRouter();
-
-  // Convert router.query dict to URLSearchParams.
-  const queryParams = new URLSearchParams();
-  for (const key in router.query) {
-    const value = router.query[key];
-    if (Array.isArray(value)) {
-      value.forEach((v) => queryParams.append(key, v));
-    } else {
-      queryParams.append(key, router.query[key] as string);
-    }
-  }
-
-  // Convert tag query parameter to tag[].
-  if (queryParams.has("tag")) {
-    queryParams.append("tag[]", queryParams.get("tag") as string);
-    queryParams.delete("tag");
-  }
-
-  // Update the tag query parameter.
-  // If tag is active, remove it from the query string.
-  if (isActive) {
-    queryParams.delete("tag[]", tag);
-  } else {
-    queryParams.append("tag[]", tag);
-  }
-
-  // Convert URLSearchParams to query string.
-  // Replace %5B%5D= with []= to be more readable.
-  const queryString = queryParams.toString().replaceAll("%5B%5D=", "[]=");
-
-  // Return the query string.
-  return queryString.length ? `/?${queryString}` : "/";
-}
-
-export function Tag({ tag, isActive, className, ...props }: TagProps) {
+export function Tag({
+  tag,
+  isActive,
+  hrefIncludeCurrentPath,
+  className,
+  ...props
+}: TagProps) {
   const Icon = isActive ? IconRemove : IconTag;
   return (
     <Link
       {...props}
       className={cn(styles.tag, className, isActive && styles.active)}
-      href={QueryString(tag, isActive)}
+      href={TagHref(tag, isActive, hrefIncludeCurrentPath)}
     >
       <Icon className={cn(styles.icon)} />
       <span className={styles.label}>{tag}</span>
@@ -69,9 +40,15 @@ interface TagsProps {
   tags: string[];
   activeTags?: string[];
   className?: string;
+  hrefIncludeCurrentPath?: boolean;
 }
 
-export function Tags({ tags, activeTags, className }: TagsProps) {
+export function Tags({
+  tags,
+  activeTags,
+  className,
+  hrefIncludeCurrentPath,
+}: TagsProps) {
   const label = getLabel("filterByTag");
   const activeTagsList = activeTags || [];
   return (
@@ -83,6 +60,7 @@ export function Tags({ tags, activeTags, className }: TagsProps) {
           tag={tag}
           isActive={activeTagsList.includes(tag)}
           scroll={false}
+          hrefIncludeCurrentPath
         />
       ))}
     </div>
